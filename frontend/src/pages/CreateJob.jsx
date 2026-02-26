@@ -13,11 +13,15 @@ export default function CreateJob() {
   });
   const [loading, setLoading] = useState(false);
 
+  const API_BASE = process.env.NODE_ENV === 'production'
+  ? 'https://hireflow-hz8e.onrender.com'
+  : '/api';
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post('/api/jobs', form);
+      await axios.post(`${API_BASE}/api/jobs`, form);
       toast.success('Job posted successfully!');
       navigate('/dashboard');
     } catch (err) {

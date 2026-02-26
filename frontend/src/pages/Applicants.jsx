@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import DeleteApplication from '../components/DeleteApplication';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -11,6 +12,7 @@ export default function Applicants() {
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
   const [cvModal, setCvModal] = useState(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -46,8 +48,9 @@ export default function Applicants() {
     }
   };
 
+  const [deletingId, setDeletingId] = useState(null);
   const removeApplicant = async (appId) => {
-    if (!window.confirm('Remove this applicant?')) return;
+    setDeletingId(appId);
     try {
       await axios.delete(`${API_BASE}/api/applications/${appId}`);
       setApplications(apps => apps.filter(a => a._id !== appId));
@@ -55,6 +58,9 @@ export default function Applicants() {
       toast.success('Applicant removed');
     } catch (err) {
       toast.error('Failed to remove');
+    } finally {
+      setDeleteModalOpen(false);
+      setDeletingId(null);
     }
   };
 
@@ -245,9 +251,18 @@ export default function Applicants() {
                   </div>
                 </div>
 
-                <button onClick={() => removeApplicant(selected._id)} className="btn-danger" style={{ width: '100%', marginTop: 8 }}>
+                <button onClick={() => setDeleteModalOpen(true)} className="btn-danger" style={{ width: '100%', marginTop: 8 }}>
                   🗑️ Remove Applicant
                 </button>
+                <DeleteApplication
+                  open={deleteModalOpen}
+                  title="Delete Application"
+                  message="Are you sure you want to delete this application? This action cannot be undone."
+                  confirmLabel={deletingId ? 'Deleting...' : 'Delete'}
+                  cancelLabel="Cancel"
+                  onConfirm={() => removeApplicant(selected._id)}
+                  onCancel={() => setDeleteModalOpen(false)}
+                />
               </div>
             </div>
           )}

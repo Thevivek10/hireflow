@@ -3,10 +3,12 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { formatDistanceToNow } from 'date-fns';
 import toast from 'react-hot-toast';
+import ConfirmModal from '../components/ConfirmModal';
 
 export default function MyApplications() {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [pendingWithdrawId, setPendingWithdrawId] = useState(null);
 
   useEffect(() => {
     axios.get('/api/applications/my')
@@ -16,7 +18,6 @@ export default function MyApplications() {
   }, []);
 
   const withdrawApplication = async (appId) => {
-    if (!window.confirm('Withdraw this application?')) return;
     try {
       await axios.delete(`/api/applications/${appId}`);
       setApplications(apps => apps.filter(a => a._id !== appId));
@@ -24,6 +25,7 @@ export default function MyApplications() {
     } catch (err) {
       toast.error('Failed to withdraw application');
     }
+    setPendingWithdrawId(null);
   };
 
   const getScoreColor = (score) => {
@@ -93,7 +95,7 @@ export default function MyApplications() {
                     <button
                       type="button"
                       style={styles.withdrawBtn}
-                      onClick={() => withdrawApplication(app._id)}
+                      onClick={() => setPendingWithdrawId(app._id)}
                     >
                       Withdraw
                     </button>
@@ -103,6 +105,16 @@ export default function MyApplications() {
             ))}
           </div>
         )}
+        {/* Withdraw confirmation modal */}
+        <ConfirmModal
+          open={!!pendingWithdrawId}
+          title="Withdraw application"
+          message="Are you sure you want to withdraw this application? The employer will no longer see your CV for this job."
+          confirmLabel="Yes, withdraw"
+          cancelLabel="Keep application"
+          onCancel={() => setPendingWithdrawId(null)}
+          onConfirm={() => withdrawApplication(pendingWithdrawId)}
+        />
       </div>
     </div>
   );
@@ -126,7 +138,7 @@ const styles = {
     alignItems: 'flex-start',
     flexWrap: 'wrap',
   },
-  cardLeft: { flex: 1, minWidth: 250 },
+  cardLeft: { flex: 1, minWidth: 250, textAlign: 'left' },
   cardTop: { display: 'flex', gap: 8, alignItems: 'center', marginBottom: 10 },
   category: {
     fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px',

@@ -23,14 +23,74 @@ const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 }, fileFilt
   cb(null, allowed.includes(ext));
 }});
 
-// AI scoring function (currently disabled while migrating to Gemini)
+// AI scoring function using Gemini
 async function scoreCV(cvText, jobDescription, jobRequirements, jobTitle) {
-  return {
-    score: 0,
-    analysis: 'AI scoring temporarily disabled',
-    strengths: [],
-    gaps: [],
-  };
+  try {
+    const { GoogleGenAI } = await import('@google/genai');
+    const apiKey = process.env.GEMINI_API_KEY;
+
+    if (!apiKey) {
+      console.warn('GEMINI_API_KEY not set, skipping AI scoring');
+      return {
+        score: 0,
+        analysis: 'AI scoring is not configured (missing GEMINI_API_KEY).',
+        strengths: [],
+        gaps: [],
+      };
+    }
+
+    const client = new GoogleGenAI({ apiKey });
+
+    const prompt = `
+You are an expert technical recruiter. Score how well this candidate's CV matches the job.
+
+Return ONLY valid JSON in this exact format (no extra text):
+{
+  "score": 0-100 integer match score,
+  "analysis": "1 short paragraph explaining why you gave this score",
+  "strengths": ["bullet", "points"],
+  "gaps": ["bullet", "points"]
+}
+
+JOB TITLE:
+${jobTitle}
+
+JOB DESCRIPTION:
+${jobDescription}
+
+JOB REQUIREMENTS:
+${jobRequirements}
+
+CV TEXT:
+${cvText}
+`;
+
+    const response = await client.models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: prompt,
+    });
+
+    const raw = response.text || '';
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+
+    const score = Math.min(100, Math.max(0, parseInt(parsed.score, 10) || 0));
+
+    return {
+      score,
+      analysis: parsed.analysis || 'AI analysis unavailable.',
+      strengths: Array.isArray(parsed.strengths) ? parsed.strengths : [],
+      gaps: Array.isArray(parsed.gaps) ? parsed.gaps : [],
+    };
+  } catch (err) {
+    console.error('Error scoring CV with Gemini:', err);
+    return {
+      score: 0,
+      analysis: 'AI scoring failed; defaulting score to 0.',
+      strengths: [],
+      gaps: [],
+    };
+  }
 }
 
 // Re-rank all applications for a job

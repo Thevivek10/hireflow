@@ -14,11 +14,15 @@ export default function Register() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  const API_BASE = process.env.NODE_ENV === 'production'
+  ? 'https://your-backend-domain.com/api'
+  : '/api';
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const { data } = await axios.post('/api/auth/register', form);
+      const { data } = await axios.post(`${API_BASE}/api/auth/register`, form);
       login(data.token, data.user);
       toast.success('Account created!');
       navigate('/dashboard');

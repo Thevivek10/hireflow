@@ -1,9 +1,5 @@
 # HireFlow — AI-Powered Job Application Pipeline
 
-A full-stack MERN application with AI-driven CV shortlisting, ranking, and generation powered by Claude AI.
-
----
-
 ## ✨ Key Features
 
 ### For Employers
@@ -31,7 +27,7 @@ A full-stack MERN application with AI-driven CV shortlisting, ranking, and gener
 | Frontend | React 18, React Router v6, Recharts |
 | Backend | Node.js, Express.js |
 | Database | MongoDB with Mongoose |
-| AI | Anthropic Claude (claude-sonnet-4-20250514) |
+| AI | Gemini 3 pro |
 | Auth | JWT |
 | File Upload | Multer |
 | PDF Parsing | pdf-parse |
@@ -134,8 +130,8 @@ job-tracker/
 
 1. Employer posts a job with a description and requirements
 2. Applicant submits CV (uploaded PDF or AI-generated)
-3. **Immediately on submission**, the backend sends the CV text + job requirements to Claude API
-4. Claude scores the candidate 0-100 and writes an analysis
+3. **Immediately on submission**, the backend sends the CV text + job requirements to Gemini API
+4. Gemini scores the candidate 0-100 and writes an analysis
 5. All applicants for that job are **re-ranked** by score
 6. Employer sees a ranked list — #1 is the best match
 

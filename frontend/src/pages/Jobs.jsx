@@ -19,6 +19,10 @@ export default function Jobs() {
   const [total, setTotal] = useState(0);
   const [pages, setPages] = useState(1);
 
+  const API_BASE = process.env.NODE_ENV === 'production'
+  ? 'https://hireflow-hz8e.onrender.com'
+  : '/api';
+  
   useEffect(() => {
     fetchJobs();
   }, [search, category, status, sort, page]);
@@ -27,7 +31,7 @@ export default function Jobs() {
     setLoading(true);
     try {
       const params = new URLSearchParams({ search, category, status, sort, page, limit: 9 });
-      const { data } = await axios.get(`/api/jobs?${params}`);
+      const { data } = await axios.get(`${API_BASE}/api/jobs?${params}`);
       setJobs(data.jobs);
       setTotal(data.total);
       setPages(data.pages);

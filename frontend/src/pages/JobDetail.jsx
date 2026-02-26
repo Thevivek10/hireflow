@@ -11,8 +11,12 @@ export default function JobDetail() {
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const API_BASE = process.env.NODE_ENV === 'production'
+  ? 'https://hireflow-hz8e.onrender.com'
+  : '/api';
+
   useEffect(() => {
-    axios.get(`/api/jobs/${id}`)
+    axios.get(`${API_BASE}/api/jobs/${id}`)
       .then(r => setJob(r.data))
       .catch(() => navigate('/jobs'))
       .finally(() => setLoading(false));

@@ -10,6 +10,10 @@ export default function Dashboard() {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const API_BASE = process.env.NODE_ENV === 'production'
+  ? 'https://hireflow-hz8e.onrender.com'
+  : '/api';
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -17,7 +21,7 @@ export default function Dashboard() {
   const fetchData = async () => {
     try {
       if (user.role === 'employer') {
-        const { data } = await axios.get('/api/jobs/my');
+        const { data } = await axios.get(`${API_BASE}/api/jobs/my`);
         setJobs(data);
       }
     } catch (err) {
@@ -30,7 +34,7 @@ export default function Dashboard() {
   const deleteJob = async (id, title) => {
     if (!window.confirm(`Delete "${title}"? This will remove all applications.`)) return;
     try {
-      await axios.delete(`/api/jobs/${id}`);
+      await axios.delete(`${API_BASE}/api/jobs/${id}`);
       setJobs(jobs.filter(j => j._id !== id));
       toast.success('Job deleted');
     } catch (err) {

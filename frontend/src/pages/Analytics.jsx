@@ -29,8 +29,12 @@ export default function Analytics() {
   const [loading, setLoading] = useState(true);
   const [insightLoading, setInsightLoading] = useState(false);
 
+  const API_BASE = process.env.NODE_ENV === 'production'
+  ? 'https://hireflow-hz8e.onrender.com'
+  : '/api';
+
   useEffect(() => {
-    axios.get('/api/analytics')
+    axios.get(`${API_BASE}/api/analytics`)
       .then(r => { setData(r.data); generateInsights(r.data); })
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -39,7 +43,7 @@ export default function Analytics() {
   const generateInsights = async (analyticsData) => {
     setInsightLoading(true);
     try {
-      const { data: insights } = await axios.post('/api/ai/insights', { applications: analyticsData });
+      const { data: insights } = await axios.post(`${API_BASE}/api/ai/insights`, { applications: analyticsData });
       setInsights(insights);
     } catch (err) {
       console.error('Insights failed');

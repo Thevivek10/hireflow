@@ -25,8 +25,12 @@ export default function ApplyJob() {
     additionalInfo: ''
   });
 
+  const API_BASE = process.env.NODE_ENV === 'production'
+  ? 'https://hireflow-hz8e.onrender.com'
+  : '/api';
+
   useEffect(() => {
-    axios.get(`/api/jobs/${id}`).then(r => setJob(r.data)).catch(() => navigate('/jobs'));
+    axios.get(`${API_BASE}/api/jobs/${id}`).then(r => setJob(r.data)).catch(() => navigate('/jobs'));
   }, [id]);
 
   const generateCV = async () => {
@@ -36,7 +40,7 @@ export default function ApplyJob() {
     }
     setAiLoading(true);
     try {
-      const { data } = await axios.post('/api/ai/generate-cv', {
+      const { data } = await axios.post(`${API_BASE}/api/ai/generate-cv`, {
         jobTitle: job.title,
         jobDescription: job.description,
         jobRequirements: job.requirements,
@@ -73,7 +77,7 @@ export default function ApplyJob() {
         formData.append('cvData', JSON.stringify(generatedCV));
       }
 
-      await axios.post(`/api/applications/${id}`, formData, {
+      await axios.post(`${API_BASE}/api/applications/${id}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 

@@ -10,8 +10,12 @@ export default function MyApplications() {
   const [loading, setLoading] = useState(true);
   const [pendingWithdrawId, setPendingWithdrawId] = useState(null);
 
+  const API_BASE = process.env.NODE_ENV === 'production'
+  ? 'https://hireflow-hz8e.onrender.com'
+  : '/api';
+
   useEffect(() => {
-    axios.get('/api/applications/my')
+    axios.get(`${API_BASE}/api/applications/my`)
       .then(r => setApplications(r.data))
       .catch(() => toast.error('Failed to load'))
       .finally(() => setLoading(false));
@@ -19,7 +23,7 @@ export default function MyApplications() {
 
   const withdrawApplication = async (appId) => {
     try {
-      await axios.delete(`/api/applications/${appId}`);
+      await axios.delete(`${API_BASE}/api/applications/${appId}`);
       setApplications(apps => apps.filter(a => a._id !== appId));
       toast.success('Application withdrawn');
     } catch (err) {

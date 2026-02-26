@@ -16,11 +16,15 @@ export default function Applicants() {
     fetchData();
   }, [id]);
 
+  const API_BASE = process.env.NODE_ENV === 'production'
+  ? 'https://hireflow-hz8e.onrender.com'
+  : '/api';
+
   const fetchData = async () => {
     try {
       const [jobRes, appsRes] = await Promise.all([
-        axios.get(`/api/jobs/${id}`),
-        axios.get(`/api/jobs/${id}/applicants`)
+        axios.get(`${API_BASE}/api/jobs/${id}`),
+        axios.get(`${API_BASE}/api/jobs/${id}/applicants`)
       ]);
       setJob(jobRes.data);
       setApplications(appsRes.data);
@@ -33,7 +37,7 @@ export default function Applicants() {
 
   const updateStatus = async (appId, status) => {
     try {
-      await axios.put(`/api/applications/${appId}/status`, { status });
+      await axios.put(`${API_BASE}/api/applications/${appId}/status`, { status });
       setApplications(apps => apps.map(a => a._id === appId ? { ...a, status } : a));
       if (selected?._id === appId) setSelected(s => ({ ...s, status }));
       toast.success(`Status updated to ${status}`);
@@ -45,7 +49,7 @@ export default function Applicants() {
   const removeApplicant = async (appId) => {
     if (!window.confirm('Remove this applicant?')) return;
     try {
-      await axios.delete(`/api/applications/${appId}`);
+      await axios.delete(`${API_BASE}/api/applications/${appId}`);
       setApplications(apps => apps.filter(a => a._id !== appId));
       if (selected?._id === appId) setSelected(null);
       toast.success('Applicant removed');
@@ -57,7 +61,7 @@ export default function Applicants() {
   const viewCv = (app) => {
     // If there is an uploaded CV file, open it in a new tab via the secured API route
     if (app.cvPath) {
-      window.open(`/api/applications/${app._id}/cv`, '_blank', 'noopener,noreferrer');
+      window.open(`${API_BASE}/api/applications/${app._id}/cv`, '_blank', 'noopener,noreferrer');
       return;
     }
 

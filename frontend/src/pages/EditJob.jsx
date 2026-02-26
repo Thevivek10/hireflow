@@ -11,8 +11,12 @@ export default function EditJob() {
   const [form, setForm] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const API_BASE = process.env.NODE_ENV === 'production'
+  ? 'https://hireflow-hz8e.onrender.com'
+  : '/api';
+
   useEffect(() => {
-    axios.get(`/api/jobs/${id}`)
+    axios.get(`${API_BASE}/api/jobs/${id}`)
       .then(r => setForm(r.data))
       .catch(() => navigate('/dashboard'));
   }, [id]);
@@ -21,7 +25,7 @@ export default function EditJob() {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.put(`/api/jobs/${id}`, form);
+      await axios.put(`${API_BASE}/api/jobs/${id}`, form);
       toast.success('Job updated!');
       navigate('/dashboard');
     } catch (err) {

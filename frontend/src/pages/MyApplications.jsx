@@ -15,6 +15,17 @@ export default function MyApplications() {
       .finally(() => setLoading(false));
   }, []);
 
+  const withdrawApplication = async (appId) => {
+    if (!window.confirm('Withdraw this application?')) return;
+    try {
+      await axios.delete(`/api/applications/${appId}`);
+      setApplications(apps => apps.filter(a => a._id !== appId));
+      toast.success('Application withdrawn');
+    } catch (err) {
+      toast.error('Failed to withdraw application');
+    }
+  };
+
   const getScoreColor = (score) => {
     if (score >= 80) return '#111111';
     if (score >= 60) return '#30323a';
@@ -75,9 +86,18 @@ export default function MyApplications() {
                     )}
                   </div>
 
-                  <Link to={`/jobs/${app.jobId?._id}`}>
-                    <button style={styles.viewBtn}>View Job</button>
-                  </Link>
+                  <div style={styles.actions}>
+                    <Link to={`/jobs/${app.jobId?._id}`}>
+                      <button style={styles.viewBtn}>View</button>
+                    </Link>
+                    <button
+                      type="button"
+                      style={styles.withdrawBtn}
+                      onClick={() => withdrawApplication(app._id)}
+                    >
+                      Withdraw
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -121,7 +141,12 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'flex-end',
-    gap: 16,
+    gap: 12,
+  },
+  actions: {
+    display: 'flex',
+    gap: 8,
+    marginTop: 8,
   },
   scoreSection: { textAlign: 'right' },
   scoreLabel: { color: 'var(--text-muted)', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 4 },
@@ -131,6 +156,16 @@ const styles = {
     background: 'transparent',
     color: 'var(--text)',
     border: '1px solid var(--border)',
+    padding: '8px 16px',
+    borderRadius: 8,
+    cursor: 'pointer',
+    fontSize: 13,
+    fontWeight: 600,
+  },
+  withdrawBtn: {
+    background: '#fee2e2',
+    color: '#b91c1c',
+    border: '1px solid #fecaca',
     padding: '8px 16px',
     borderRadius: 8,
     cursor: 'pointer',

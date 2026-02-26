@@ -5,7 +5,7 @@ const auth = require('../middleware/auth');
 async function getGeminiClient() {
   const { GoogleGenAI } = await import('@google/genai');
   const apiKey = process.env.GEMINI_API_KEY;
-  console.log(apiKey)
+  
   if (!apiKey) {
     throw new Error('GEMINI_API_KEY is not set');
   }

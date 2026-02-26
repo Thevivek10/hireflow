@@ -15,7 +15,7 @@ export default function Register() {
   const navigate = useNavigate();
 
   const API_BASE = process.env.NODE_ENV === 'production'
-  ? 'https://your-backend-domain.com/api'
+  ? 'https://hireflow-hz8e.onrender.com'
   : '/api';
 
   const handleSubmit = async (e) => {

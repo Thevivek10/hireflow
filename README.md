@@ -177,3 +177,28 @@ POST   /api/ai/insights        # AI career insights
 - Responsive grid layouts
 - Recharts for data visualization
 - Score bars with color coding (green=high, red=low)
+
+---
+
+## 🐳 Run with Docker
+
+```bash
+cp .env.example .env        # set JWT_SECRET (and GEMINI_API_KEY for AI features)
+docker compose up --build
+```
+
+- App: http://localhost:3000
+- API health check: http://localhost:5000/api/health
+
+The stack runs MongoDB, the Express API and the React app (served by nginx, which proxies `/api` to the backend).
+
+## ✅ Tests and CI
+
+```bash
+cd backend
+npm install
+npm test            # Jest + Supertest, models are mocked so no database is needed
+npm run test:ci     # same, with a coverage report
+```
+
+GitHub Actions (`.github/workflows/ci.yml`) runs on every push to `main` and every pull request: backend tests with coverage, a frontend production build, and a Docker build of both images.
